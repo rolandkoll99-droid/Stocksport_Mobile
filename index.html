@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a472a">
+    <title>Stockschießen | Eisstock Teamwertung mit Sprachansage</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a472a 0%, #0a2a1a 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            touch-action: pan-y pinch-zoom;
+        }
+
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Kompakter Header für Mobile */
+        .header-sticky {
+            background: transparent;
+            flex-shrink: 0;
+            margin-bottom: 6px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            overflow: hidden;
+            padding: 8px 12px 12px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a472a;
+            margin: 0 0 2px 0;
+            font-size: 1.35rem;
+            letter-spacing: -0.3px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #5a7a5a;
+            margin-bottom: 8px;
+            font-size: 0.7rem;
+            border-bottom: 1px solid #e2e8e0;
+            padding-bottom: 5px;
+        }
+
+        /* Mobile Settings Bar – kompakt */
+        .settings-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            background: #f8faf6;
+            padding: 6px 10px;
+            border-radius: 40px;
+        }
+
+        .kehren-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #ffffffcc;
+            padding: 2px 8px;
+            border-radius: 30px;
+        }
+
+        .team-name-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            background: #ffffffcc;
+            padding: 2px 8px;
+            border-radius: 30px;
+        }
+
+        .team-name-input {
+            background: white;
+            border: 1px solid #cddfc4;
+            border-radius: 30px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            width: 105px;
+            text-align: center;
+        }
+
+        .settings-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #1a472a;
+        }
+
+        .kehren-select {
+            background: white;
+            border: 1px solid #cddfc4;
+            border-radius: 30px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .apply-btn {
+            background: #2c7a4d;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .apply-btn:active { transform: scale(0.96); background: #1f5a38; }
+
+        .speech-toggle {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #eef3ea;
+            padding: 3px 10px;
+            border-radius: 40px;
+        }
+        .speech-toggle label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #1a472a;
+        }
+        .speech-toggle input {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+        }
+
+        /* Nächste Kehre Anzeige */
+        .next-kehre-container {
+            text-align: center;
+            margin-top: 5px;
+            margin-bottom: 4px;
+        }
+        .next-kehre-badge {
+            background: #eef3ea;
+            border-radius: 40px;
+            padding: 4px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #1a472a;
+            border: 1px solid #c8dbc0;
+        }
+        .next-kehre-value {
+            background: #2c7a4d;
+            color: white;
+            border-radius: 40px;
+            padding: 2px 12px;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        /* Team-Karten Mobile optimiert */
+        .scoreboard {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .team-card {
+            flex: 1;
+            background: #fbfdf9;
+            border-radius: 14px;
+            padding: 6px 6px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .team-card.teamA { border-left: 3px solid #2c7a4d; }
+        .team-card.teamB { border-left: 3px solid #c0392b; }
+
+        .team-title {
+            font-size: 0.9rem;
+            font-weight: 800;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .current-score {
+            background: #f0f3ef;
+            border-radius: 30px;
+            padding: 2px 4px;
+            margin: 3px 0;
+        }
+        .current-score-label { font-size: 8px; color: #5a6e5a; }
+        .current-score-value { font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
+
+        .games-won {
+            margin-top: 4px;
+            padding-top: 3px;
+            border-top: 1px solid #e2e8e2;
+        }
+        .games-won-label { font-size: 7px; color: #8a9a88; letter-spacing: -0.2px; }
+        .games-won-value { font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .games-won-number {
+            background: #1a472a;
+            color: white;
+            padding: 1px 10px;
+            border-radius: 30px;
+            min-width: 45px;
+            font-size: 1.2rem;
+        }
+        .games-won-number.teamA { background: #2c7a4d; }
+        .games-won-number.teamB { background: #c0392b; }
+        .win-indicator { font-size: 11px; }
+        .winner-message {
+            background: linear-gradient(135deg, #ffd966, #ffb347);
+            border-radius: 40px;
+            padding: 5px 10px;
+            margin: 6px 0 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.7rem;
+            color: #1e4620;
+        }
+
+        /* Scrollbereich Tabelle - mobil optimiert */
+        .table-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 8px;
+            border-radius: 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .table-wrapper { overflow-x: auto; border-radius: 14px; }
+        .kehren-table { width: 100%; border-collapse: collapse; background: white; min-width: 380px; font-size: 0.75rem; }
+        .kehren-table th, .kehren-table td { border: 1px solid #e2e8e2; padding: 8px 4px; text-align: center; vertical-align: middle; }
+        .kehren-table th { background: #eef3ea; font-weight: 700; color: #1a472a; font-size: 0.7rem; position: sticky; top: 0; z-index: 10; }
+        .kehren-table td:first-child { font-weight: 700; background: #fafcf8; width: 45px; font-size: 0.8rem; }
+        .next-kehre-highlight td:first-child {
+            background: #ffe6b3;
+            font-weight: 800;
+            border-left: 2px solid #ffa500;
+        }
+        .next-kehre-highlight td:not(:first-child) {
+            background: #fff2df;
+        }
+
+        .punktgruppe { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; align-items: center; }
+        .punkt-btn-zahl {
+            min-width: 38px; min-height: 38px; background: white; border: 1.5px solid #cddfc4; border-radius: 30px;
+            padding: 6px 0; font-weight: 700; font-size: 0.85rem; cursor: pointer; touch-action: manipulation;
+            color: #1e4620; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .punkt-btn-zahl:active { transform: scale(0.94); background: #e9f3e3; }
+        .aktiver-wert {
+            display: inline-flex; align-items: center; justify-content: center; background: #1a472a; color: white;
+            padding: 5px 8px; border-radius: 30px; font-size: 0.85rem; font-weight: bold; min-width: 36px; min-height: 36px;
+        }
+        .loesch-icon {
+            background: #fef5f3; border: 1px solid #f0cec6; border-radius: 30px; font-size: 1rem; cursor: pointer;
+            color: #b85c4a; padding: 5px 10px; min-width: 36px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .loesch-icon:active { background: #fbeae7; transform: scale(0.94); }
+
+        /* Aktionsleiste Mobile - 2 Zeilen falls nötig */
+        .action-buttons {
+            display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap; flex-shrink: 0;
+        }
+        .action-btn {
+            padding: 6px 12px; font-size: 0.7rem; font-weight: 600; border: none; border-radius: 40px;
+            cursor: pointer; touch-action: manipulation; min-width: 85px; min-height: 38px;
+            background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .action-btn.win-game { background: #ffd966; color: #1e4620; }
+        .action-btn.reset-round { background: #eef2e8; color: #1e4620; }
+        .action-btn.newgame { background: #1a472a; color: white; }
+        .action-btn.reset-total { background: #ffe6e2; color: #b33a2a; }
+        .action-btn.export-excel { background: #2c7a4d; color: white; }
+        .action-btn.export-pdf { background: #c0392b; color: white; }
+        .action-btn:active { transform: scale(0.96); }
+
+        /* Footer mit Copyright */
+        footer {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 9px;
+            color: #d4e6d4;
+            flex-shrink: 0;
+            padding-bottom: 4px;
+            font-weight: 500;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        }
+        .footer-copyright {
+            letter-spacing: 0.3px;
+            background: rgba(0,0,0,0.2);
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 30px;
+            backdrop-filter: blur(2px);
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1a472a;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 12px;
+            z-index: 2000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            pointer-events: none;
+            white-space: normal;
+            text-align: center;
+            max-width: 90vw;
+        }
+
+        /* Modal Mobile */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75);
+            display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px);
+        }
+        .modal-dialog {
+            background: white; border-radius: 28px; max-width: 300px; width: 80%; padding: 18px 14px; text-align: center;
+        }
+        .modal-dialog h3 { font-size: 1.2rem; margin: 0 0 6px; color: #1a472a; }
+        .modal-dialog p { font-size: 0.8rem; margin-bottom: 16px; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn { padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; font-weight: 600; min-width: 80px; }
+        .modal-btn.confirm { background: #c0392b; color: white; }
+        .modal-btn.cancel { background: #e9ecef; color: #2c3e2c; }
+
+        @media print {
+            .settings-bar, .action-buttons, footer, .speech-toggle, .apply-btn, .next-kehre-container, .win-indicator, .winner-message {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header-sticky">
+        <div class="container">
+            <h1>🏅 Stockschießen Eisstock 🏅</h1>
+            <div class="subtitle">Teamwertung · 1–4 Punkte pro Kehre · First to 3 Games</div>
+
+            <!-- Einstellungen kompakt für Mobile -->
+            <div class="settings-bar">
+                <div class="kehren-group">
+                    <span class="settings-label">Kehren</span>
+                    <select id="kehrenSelect" class="kehren-select">
+                        <option value="4">4</option><option value="6" selected>6</option>
+                        <option value="8">8</option><option value="10">10</option><option value="12">12</option>
+                    </select>
+                    <button id="applyKehrenBtn" class="apply-btn">Set</button>
+                </div>
+                <div class="team-name-group">
+                    <input type="text" id="teamANameInput" class="team-name-input" value="Eisstöcke W" maxlength="18">
+                    <span style="font-size:10px;">⚡</span>
+                    <input type="text" id="teamBNameInput" class="team-name-input" value="Eisstöcke E" maxlength="18">
+                </div>
+                <div class="speech-toggle">
+                    <input type="checkbox" id="speechEnabled" checked>
+                    <label>🔊</label>
+                </div>
+            </div>
+
+            <!-- Team-Karten Mobile -->
+            <div class="scoreboard">
+                <div class="team-card teamA">
+                    <div class="team-title" id="teamATitle">🥌 Team W</div>
+                    <div class="current-score">
+                        <div class="current-score-label">RUNDE</div>
+                        <div class="current-score-value" id="currentTeamA">0</div>
+                    </div>
+                    <div class="games-won">
+                        <div class="games-won-label">🏆 SPIELE</div>
+                        <div class="games-won-value">
+                            <span class="games-won-number teamA" id="gamesWonTeamA">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="team-card teamB">
+                    <div class="team-title" id="teamBTitle">🥌 Team E</div>
+                    <div class="current-score">
+                        <div class="current-score-label">RUNDE</div>
+                        <div class="current-score-value" id="currentTeamB">0</div>
+                    </div>
+                    <div class="games-won">
+                        <div class="games-won-label">🏆 SPIELE</div>
+                        <div class="games-won-value">
+                            <span class="games-won-number teamB" id="gamesWonTeamB">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nächste Kehre Anzeige -->
+            <div class="next-kehre-container">
+                <div class="next-kehre-badge">
+                    🎯 Nächste Kehre <span class="next-kehre-value" id="nextKehreNumber">1</span>
+                </div>
+            </div>
+            <div id="winnerMessage" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Tabellenbereich (scrollbar) -->
+    <div class="table-scroll-area">
+        <div class="table-wrapper">
+            <table class="kehren-table" id="scoreTable">
+                <!-- dynamisch -->
+            </table>
+        </div>
+    </div>
+
+    <!-- Aktionsleiste -->
+    <div class="action-buttons">
+        <button class="action-btn win-game" id="winGameBtn">🏆 Gewinnen</button>
+        <button class="action-btn reset-round" id="resetRoundBtn">🔄 Runde löschen</button>
+        <button class="action-btn newgame" id="newGameBtn">✨ Neues Spiel</button>
+        <button class="action-btn reset-total" id="resetTotalBtn">🗑️ Reset Siege</button>
+        <button class="action-btn export-excel" id="exportExcelBtn">📎 CSV</button>
+        <button class="action-btn export-pdf" id="exportPdfBtn">🖨️ Drucken</button>
+    </div>
+    <footer>
+        <span class="footer-copyright">© by Roland Koll · Stockschießen mit Sprachansage</span>
+    </footer>
+</div>
+
+<script>
+    // --- MOBILE OPTIMIZED STOCKSCHIEßEN ---
+    let anzahlKehren = 6;
+    let teamAPunkte = [];
+    let teamBPunkte = [];
+    let gamesWonTeamA = 0;
+    let gamesWonTeamB = 0;
+    let gameWinnerAnnounced = false;
+
+    let teamAName = "Eisstöcke W";
+    let teamBName = "Eisstöcke E";
+    let speechEnabled = true;
+
+    // DOM
+    const teamATitleSpan = document.getElementById('teamATitle');
+    const teamBTitleSpan = document.getElementById('teamBTitle');
+    const currentTeamASpan = document.getElementById('currentTeamA');
+    const currentTeamBSpan = document.getElementById('currentTeamB');
+    const gamesWonTeamASpan = document.getElementById('gamesWonTeamA');
+    const gamesWonTeamBSpan = document.getElementById('gamesWonTeamB');
+    const winnerMessageDiv = document.getElementById('winnerMessage');
+    const teamANameInput = document.getElementById('teamANameInput');
+    const teamBNameInput = document.getElementById('teamBNameInput');
+    const kehrenSelect = document.getElementById('kehrenSelect');
+    const applyKehrenBtn = document.getElementById('applyKehrenBtn');
+    const scoreTable = document.getElementById('scoreTable');
+    const nextKehreSpan = document.getElementById('nextKehreNumber');
+    const speechCheckbox = document.getElementById('speechEnabled');
+
+    // Sprachausgabe
+    function speakText(text) {
+        if (!speechEnabled) return;
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'de-DE';
+            utterance.rate = 0.85;
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    function showToast(message, duration = 2800) {
+        let toast = document.getElementById('dynamicToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'dynamicToast';
+            toast.className = 'toast-msg';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, duration);
+    }
+
+    function announceKehrePoints(team, kehreIndex, points) {
+        const teamName = team === 'A' ? teamAName : teamBName;
+        const kehreNumber = kehreIndex + 1;
+        const pointsText = points === 1 ? "einen Punkt" : `${points} Punkte`;
+        const message = `${teamName} erzielt bei Kehre ${kehreNumber} ${pointsText}.`;
+        speakText(message);
+        showToast(message, 2200);
+    }
+
+    function getNextKehreIndex() {
+        for (let i = 0; i < anzahlKehren; i++) {
+            if ((teamAPunkte[i] || 0) === 0 && (teamBPunkte[i] || 0) === 0) return i;
+        }
+        return -1;
+    }
+    
+    function updateNextKehreDisplay() {
+        const nextIdx = getNextKehreIndex();
+        if (nextIdx !== -1 && nextIdx < anzahlKehren) {
+            nextKehreSpan.textContent = (nextIdx + 1).toString();
+            highlightNextKehreRow(nextIdx);
+        } else {
+            nextKehreSpan.textContent = "✓";
+            highlightNextKehreRow(-1);
+        }
+    }
+    
+    function highlightNextKehreRow(nextIndex) {
+        const tbody = scoreTable.querySelector('tbody');
+        if (!tbody) return;
+        const rows = tbody.querySelectorAll('tr');
+        rows.forEach(row => row.classList.remove('next-kehre-highlight'));
+        if (nextIndex >= 0 && nextIndex < rows.length) rows[nextIndex].classList.add('next-kehre-highlight');
+    }
+
+    function berechneSumme(arr) { return arr.reduce((a,b) => a + (b || 0), 0); }
+
+    function updateTotals() {
+        const sumA = berechneSumme(teamAPunkte);
+        const sumB = berechneSumme(teamBPunkte);
+        currentTeamASpan.textContent = sumA;
+        currentTeamBSpan.textContent = sumB;
+        gamesWonTeamASpan.textContent = gamesWonTeamA;
+        gamesWonTeamBSpan.textContent = gamesWonTeamB;
+        
+        // Sieger prüfen
+        if (gamesWonTeamA >= 3 && !gameWinnerAnnounced) {
+            gameWinnerAnnounced = true;
+            winnerMessageDiv.style.display = 'block';
+            winnerMessageDiv.className = 'winner-message';
+            winnerMessageDiv.innerHTML = `🏆🏅 ${teamAName} gewinnt den Gesamtsieg! 🏅🏆`;
+            speakText(`${teamAName} hat den Gesamtsieg errungen!`);
+        } else if (gamesWonTeamB >= 3 && !gameWinnerAnnounced) {
+            gameWinnerAnnounced = true;
+            winnerMessageDiv.style.display = 'block';
+            winnerMessageDiv.className = 'winner-message';
+            winnerMessageDiv.innerHTML = `🏆🏅 ${teamBName} gewinnt den Gesamtsieg! 🏅🏆`;
+            speakText(`${teamBName} hat den Gesamtsieg errungen!`);
+        } else if (gamesWonTeamA < 3 && gamesWonTeamB < 3 && gameWinnerAnnounced) {
+            gameWinnerAnnounced = false;
+            winnerMessageDiv.style.display = 'none';
+            winnerMessageDiv.innerHTML = '';
+        }
+        updateNextKehreDisplay();
+    }
+
+    function setPoints(team, kehre, wert) {
+        if (wert >= 1 && wert <= 4) {
+            let oldVal = (team === 'A' ? teamAPunkte[kehre] : teamBPunkte[kehre]) || 0;
+            if (team === 'A') teamAPunkte[kehre] = wert;
+            else teamBPunkte[kehre] = wert;
+            if (oldVal !== wert) announceKehrePoints(team, kehre, wert);
+        }
+        renderTable();
+    }
+
+    function deleteKehre(team, kehre) {
+        if (team === 'A') teamAPunkte[kehre] = 0;
+        else teamBPunkte[kehre] = 0;
+        renderTable();
+    }
+
+    function resetCurrentRound() {
+        for (let i = 0; i < anzahlKehren; i++) {
+            teamAPunkte[i] = 0;
+            teamBPunkte[i] = 0;
+        }
+        renderTable();
+    }
+
+    function showWinnerSelection(sumA, sumB) {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        const dialog = document.createElement('div');
+        dialog.className = 'modal-dialog';
+        dialog.innerHTML = `
+            <h3>🤝 Unentschieden!</h3>
+            <p>Runde endet ${sumA}:${sumB}.<br>Wer erhält den Spielpunkt?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm" id="winnerTeamA">🥌 ${teamAName}</button>
+                <button class="modal-btn confirm" id="winnerTeamB">🥌 ${teamBName}</button>
+                <button class="modal-btn cancel" id="modalCancel">Abbrechen</button>
+            </div>
+        `;
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        const closeModal = () => overlay.remove();
+        dialog.querySelector('#winnerTeamA').addEventListener('click', () => {
+            gamesWonTeamA++;
+            resetCurrentRound();
+            updateTotals();
+            closeModal();
+        });
+        dialog.querySelector('#winnerTeamB').addEventListener('click', () => {
+            gamesWonTeamB++;
+            resetCurrentRound();
+            updateTotals();
+            closeModal();
+        });
+        dialog.querySelector('#modalCancel').addEventListener('click', closeModal);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+    }
+
+    function winGame() {
+        const sumA = berechneSumme(teamAPunkte);
+        const sumB = berechneSumme(teamBPunkte);
+        if (sumA === 0 && sumB === 0) {
+            showToast("Bitte erst Punkte vergeben!", 1500);
+            return;
+        }
+        if (sumA === sumB) {
+            showWinnerSelection(sumA, sumB);
+        } else {
+            const winner = sumA > sumB ? 'A' : 'B';
+            const winnerName = winner === 'A' ? teamAName : teamBName;
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            const dialog = document.createElement('div');
+            dialog.className = 'modal-dialog';
+            dialog.innerHTML = `
+                <h3>🏆 Spiel gewonnen</h3>
+                <p>${winnerName} gewinnt die Runde (${sumA}:${sumB}).</p>
+                <div class="modal-buttons">
+                    <button class="modal-btn cancel" id="modalCancel">Abbrechen</button>
+                    <button class="modal-btn confirm" id="modalConfirm">Bestätigen</button>
+                </div>
+            `;
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+            const close = () => overlay.remove();
+            dialog.querySelector('#modalCancel').addEventListener('click', close);
+            dialog.querySelector('#modalConfirm').addEventListener('click', () => {
+                if (winner === 'A') gamesWonTeamA++;
+                else gamesWonTeamB++;
+                resetCurrentRound();
+                updateTotals();
+                close();
+            });
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+        }
+    }
+
+    function newGame() {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        const dialog = document.createElement('div');
+        dialog.className = 'modal-dialog';
+        dialog.innerHTML = `<h3>Neues Spiel</h3><p>Alle Punkte & Siege zurücksetzen?</p><div class="modal-buttons"><button class="modal-btn cancel" id="cancelBtn">Nein</button><button class="modal-btn confirm" id="confirmBtn">Ja</button></div>`;
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        const close = () => overlay.remove();
+        dialog.querySelector('#cancelBtn').addEventListener('click', close);
+        dialog.querySelector('#confirmBtn').addEventListener('click', () => {
+            for (let i = 0; i < anzahlKehren; i++) { teamAPunkte[i] = 0; teamBPunkte[i] = 0; }
+            gamesWonTeamA = 0; gamesWonTeamB = 0; gameWinnerAnnounced = false;
+            renderTable(); updateTotals(); close();
+        });
+    }
+
+    function resetTotalScore() {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        const dialog = document.createElement('div');
+        dialog.className = 'modal-dialog';
+        dialog.innerHTML = `<h3>Gesamtsiege zurücksetzen</h3><p>Gewonnene Spiele löschen? Aktuelle Runde bleibt.</p><div class="modal-buttons"><button class="modal-btn cancel">Abbrechen</button><button class="modal-btn confirm">Zurücksetzen</button></div>`;
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        const close = () => overlay.remove();
+        dialog.querySelector('.cancel').addEventListener('click', close);
+        dialog.querySelector('.confirm').addEventListener('click', () => {
+            gamesWonTeamA = 0; gamesWonTeamB = 0; gameWinnerAnnounced = false;
+            updateTotals(); close();
+        });
+    }
+
+    function changeKehrenAnzahl(neueAnzahl) {
+        const neueA = new Array(neueAnzahl).fill(0);
+        const neueB = new Array(neueAnzahl).fill(0);
+        for (let i = 0; i < Math.min(teamAPunkte.length, neueAnzahl); i++) {
+            neueA[i] = teamAPunkte[i] || 0;
+            neueB[i] = teamBPunkte[i] || 0;
+        }
+        teamAPunkte = neueA;
+        teamBPunkte = neueB;
+        anzahlKehren = neueAnzahl;
+        renderTable();
+        updateTotals();
+    }
+
+    function renderTable() {
+        scoreTable.innerHTML = '';
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        headerRow.appendChild(createTh('Kehre'));
+        headerRow.appendChild(createTh(`${teamAName}`));
+        headerRow.appendChild(createTh(`${teamBName}`));
+        thead.appendChild(headerRow);
+        scoreTable.appendChild(thead);
+        const tbody = document.createElement('tbody');
+        for (let i = 0; i < anzahlKehren; i++) {
+            const row = document.createElement('tr');
+            const kehreCell = document.createElement('td');
+            kehreCell.textContent = `${i+1}`;
+            row.appendChild(kehreCell);
+            // Team A Zellen
+            const cellA = document.createElement('td');
+            const containerA = document.createElement('div');
+            containerA.className = 'punktgruppe';
+            for (let p = 1; p <= 4; p++) {
+                const btn = document.createElement('button');
+                btn.textContent = p;
+                btn.classList.add('punkt-btn-zahl');
+                btn.addEventListener('click', (e) => { e.stopPropagation(); setPoints('A', i, p); });
+                containerA.appendChild(btn);
+            }
+            const wertA = document.createElement('span');
+            wertA.className = 'aktiver-wert';
+            wertA.textContent = (teamAPunkte[i] || 0);
+            const delA = document.createElement('button');
+            delA.textContent = '🗑️';
+            delA.classList.add('loesch-icon');
+            delA.addEventListener('click', () => deleteKehre('A', i));
+            containerA.appendChild(wertA);
+            containerA.appendChild(delA);
+            cellA.appendChild(containerA);
+            row.appendChild(cellA);
+            // Team B
+            const cellB = document.createElement('td');
+            const containerB = document.createElement('div');
+            containerB.className = 'punktgruppe';
+            for (let p = 1; p <= 4; p++) {
+                const btn = document.createElement('button');
+                btn.textContent = p;
+                btn.classList.add('punkt-btn-zahl');
+                btn.addEventListener('click', () => setPoints('B', i, p));
+                containerB.appendChild(btn);
+            }
+            const wertB = document.createElement('span');
+            wertB.className = 'aktiver-wert';
+            wertB.textContent = (teamBPunkte[i] || 0);
+            const delB = document.createElement('button');
+            delB.textContent = '🗑️';
+            delB.classList.add('loesch-icon');
+            delB.addEventListener('click', () => deleteKehre('B', i));
+            containerB.appendChild(wertB);
+            containerB.appendChild(delB);
+            cellB.appendChild(containerB);
+            row.appendChild(cellB);
+            tbody.appendChild(row);
+        }
+        scoreTable.appendChild(tbody);
+        updateTotals();
+    }
+
+    function createTh(txt) { const th = document.createElement('th'); th.textContent = txt; return th; }
+
+    function exportCSV() {
+        let rows = [`Kehre;${teamAName};${teamBName}`];
+        for (let i=0; i<anzahlKehren; i++) rows.push(`${i+1};${teamAPunkte[i]||0};${teamBPunkte[i]||0}`);
+        rows.push(`Summe;${berechneSumme(teamAPunkte)};${berechneSumme(teamBPunkte)}`);
+        rows.push(`Gewonnene Spiele;${gamesWonTeamA};${gamesWonTeamB}`);
+        const blob = new Blob(["\uFEFF" + rows.join('\n')], {type:"text/csv;charset=utf-8"});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = "stockschiessen_wertung.csv";
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    function exportPDF() { window.print(); }
+
+    function updateTeamNameUI() {
+        teamATitleSpan.innerHTML = `🥌 ${teamAName}`;
+        teamBTitleSpan.innerHTML = `🥌 ${teamBName}`;
+        renderTable();
+    }
+
+    function init() {
+        teamAPunkte = new Array(6).fill(0);
+        teamBPunkte = new Array(6).fill(0);
+        anzahlKehren = 6;
+        gamesWonTeamA = 0; gamesWonTeamB = 0;
+        teamANameInput.value = teamAName;
+        teamBNameInput.value = teamBName;
+        renderTable();
+        updateTeamNameUI();
+        // Eventlistener
+        document.getElementById('winGameBtn').addEventListener('click', winGame);
+        document.getElementById('resetRoundBtn').addEventListener('click', resetCurrentRound);
+        document.getElementById('newGameBtn').addEventListener('click', newGame);
+        document.getElementById('resetTotalBtn').addEventListener('click', resetTotalScore);
+        document.getElementById('exportExcelBtn').addEventListener('click', exportCSV);
+        document.getElementById('exportPdfBtn').addEventListener('click', exportPDF);
+        applyKehrenBtn.addEventListener('click', () => {
+            const neue = parseInt(kehrenSelect.value,10);
+            if(neue !== anzahlKehren) changeKehrenAnzahl(neue);
+        });
+        teamANameInput.addEventListener('input', (e) => { teamAName = e.target.value.trim() || "Team A"; updateTeamNameUI(); });
+        teamBNameInput.addEventListener('input', (e) => { teamBName = e.target.value.trim() || "Team B"; updateTeamNameUI(); });
+        speechCheckbox.addEventListener('change', (e) => { speechEnabled = e.target.checked; });
+    }
+    init();
+</script>
+</body>
+</html>
