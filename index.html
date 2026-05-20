@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ESV Grein | Stockpunkt-Wertung | 4-6 Spieler | 4-6 Punkte | 4-12 Kehren</title>
+    <title>ESV Grein | Automatik-Wertung | Kehren farbig</title>
     <style>
         * {
             margin: 0;
@@ -28,7 +28,7 @@
             height: 100%;
             background: #fefcf5;
             display: grid;
-            grid-template-columns: 320px 1fr 320px;
+            grid-template-columns: 340px 1fr 340px;
             grid-template-rows: auto 1fr auto;
             overflow: hidden;
             box-shadow: 0 0 0 2px #d1e2c4;
@@ -37,13 +37,13 @@
         .top-bar {
             grid-column: 1 / -1;
             background: white;
-            padding: 10px 20px;
+            padding: 8px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #deecd2;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             z-index: 10;
         }
         h1 {
@@ -55,9 +55,9 @@
         }
         .settings-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             background: #f6faf3;
-            padding: 5px 16px;
+            padding: 4px 14px;
             border-radius: 60px;
             flex-wrap: wrap;
             align-items: center;
@@ -65,26 +65,26 @@
         .team-name-input {
             border: 2px solid #c2d6b8;
             border-radius: 40px;
-            padding: 5px 10px;
+            padding: 4px 10px;
             font-weight: 600;
             width: 110px;
             text-align: center;
             font-size: 0.8rem;
         }
         .setting-select {
-            padding: 5px 12px;
+            padding: 4px 10px;
             border-radius: 40px;
             border: none;
             background: white;
             border: 1px solid #bbd4ae;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
         .apply-btn {
             background: #2d6a4f;
             color: white;
             cursor: pointer;
-            padding: 5px 16px;
+            padding: 4px 14px;
             border-radius: 40px;
             border: none;
             font-weight: bold;
@@ -92,74 +92,76 @@
         .speech-toggle {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             background: #eef3ea;
-            padding: 3px 14px;
+            padding: 3px 12px;
             border-radius: 40px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
 
         .input-left, .input-right {
             background: #fafdf8;
             overflow-y: auto;
-            padding: 14px 10px;
+            padding: 12px 10px;
         }
         .input-left { border-right: 2px solid #dae9ce; }
         .input-right { border-left: 2px solid #dae9ce; }
 
         .team-header {
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 800;
             text-align: center;
             background: #eef3ea;
             border-radius: 50px;
-            padding: 6px;
+            padding: 8px;
             margin-bottom: 14px;
             color: #155f2e;
         }
         .stock-grid-side {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
         .stock-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: white;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 50px;
             border: 1px solid #e0ecd6;
-            transition: background 0.1s ease;
+            transition: all 0.1s ease;
         }
-        .stock-row.current-stock-bg {
+        /* Farbige Hinterlegung für Kehren (gilt für jede Stock-Zeile in der aktuellen/gespielten Kehre) */
+        .stock-row.current-kehre-bg {
             background: #c8e6c9 !important;
-            border-left: 5px solid #2e7d32;
+            border-left: 6px solid #2e7d32;
         }
-        .stock-row.played-stock-bg {
+        .stock-row.played-kehre-bg {
             background: #ffcdd2 !important;
-            border-left: 5px solid #c62828;
+            border-left: 6px solid #c62828;
+            text-decoration: none;
         }
         .stock-nr {
             font-weight: 800;
-            width: 55px;
-            font-size: 0.8rem;
+            width: 60px;
+            font-size: 0.85rem;
             color: #2d692d;
         }
         .punkte-group {
             display: flex;
-            gap: 5px;
+            gap: 6px;
             align-items: center;
             flex-wrap: wrap;
         }
         .side-punkt {
-            min-width: 40px;
-            min-height: 36px;
+            min-width: 42px;
+            min-height: 38px;
             background: white;
             border: 2px solid #cbdfc1;
             border-radius: 40px;
             font-weight: 800;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: 0.05s linear;
         }
@@ -167,22 +169,22 @@
         .side-value {
             background: #2c7a4d;
             color: white;
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 40px;
             font-weight: 800;
-            min-width: 46px;
+            min-width: 52px;
             text-align: center;
-            font-size: 0.85rem;
+            font-size: 1rem;
         }
         .side-del {
             background: #fef1ec;
             border: 2px solid #efcdc2;
             border-radius: 40px;
-            width: 38px;
-            height: 36px;
+            width: 40px;
+            height: 38px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
 
         .center-hero {
@@ -190,102 +192,105 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 14px 16px;
+            padding: 16px 20px;
             overflow-y: auto;
         }
 
+        /* GRÖSSERE ERGEBNISANZEIGE */
         .result-mega {
             display: flex;
-            gap: 25px;
+            gap: 35px;
             justify-content: center;
             align-items: stretch;
-            margin: 5px 0 12px;
+            margin: 10px 0 20px;
         }
         .result-card-big {
             flex: 1;
             background: #fafef5;
-            border-radius: 40px;
-            padding: 16px 12px;
+            border-radius: 56px;
+            padding: 24px 16px;
             text-align: center;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.05);
-            border: 1px solid #e2efda;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+            border: 2px solid #e2efda;
         }
         .result-team-big {
-            font-size: 1.4rem;
+            font-size: 2rem;
             font-weight: 900;
-            margin-bottom: 6px;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
         }
         .current-round-big {
-            font-size: 2.8rem;
+            font-size: 4.8rem;
             font-weight: 900;
-            margin: 6px 0;
+            margin: 12px 0;
             color: #1c691c;
             background: #ecf7e5;
-            border-radius: 70px;
-            padding: 6px;
+            border-radius: 80px;
+            padding: 12px 8px;
         }
         .games-won-big {
-            font-size: 0.8rem;
+            font-size: 1rem;
             background: #e9f2e2;
             border-radius: 60px;
-            padding: 6px;
+            padding: 10px;
+            margin-top: 8px;
         }
         .games-number-big {
-            font-size: 1.8rem;
+            font-size: 2.6rem;
             font-weight: 800;
             background: #1b4d1b;
             color: white;
             display: inline-block;
-            padding: 2px 18px;
+            padding: 6px 28px;
             border-radius: 60px;
-            min-width: 60px;
+            min-width: 90px;
         }
 
         .info-row {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 25px;
             flex-wrap: wrap;
             align-items: baseline;
-            margin-top: 5px;
+            margin: 10px 0 5px;
         }
-        .current-stock-center {
+        .current-kehre-display {
             text-align: center;
             background: linear-gradient(135deg, #eef3e4, #e2ecd6);
             border-radius: 60px;
-            padding: 4px 18px;
+            padding: 6px 20px;
             display: inline-block;
         }
-        .current-stock-label {
-            font-size: 0.75rem;
+        .current-kehre-label {
+            font-size: 0.85rem;
             font-weight: 700;
             color: #4a6e3e;
         }
-        .current-stock-number {
-            font-size: 1.4rem;
+        .current-kehre-number {
+            font-size: 1.7rem;
             font-weight: 900;
             color: #1b4d1b;
             background: white;
-            padding: 1px 16px;
+            padding: 2px 20px;
             border-radius: 50px;
             display: inline-block;
-            margin-left: 8px;
-            min-width: 55px;
+            margin-left: 10px;
+            min-width: 70px;
         }
         .global-winner {
             background: #ffecb3;
             border-radius: 60px;
-            padding: 6px 18px;
-            margin-top: 8px;
+            padding: 10px 24px;
+            margin-top: 12px;
             text-align: center;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 1rem;
         }
         .lock-info {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             background: #f1e6cc;
             border-radius: 30px;
-            padding: 3px 12px;
+            padding: 5px 14px;
             display: inline-block;
         }
 
@@ -296,17 +301,17 @@
             padding: 10px 20px;
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: 15px;
             flex-wrap: wrap;
         }
         .action-btn {
             background: #f0f5eb;
             border: none;
-            padding: 6px 18px;
+            padding: 8px 20px;
             border-radius: 60px;
             font-weight: 700;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
         }
         .action-btn:active { transform: scale(0.96); }
         .action-win { background: #ffdf8c; color: #1e4a1a; }
@@ -322,11 +327,11 @@
             transform: translateX(-50%);
             background: #1a472a;
             color: white;
-            padding: 8px 20px;
+            padding: 10px 24px;
             border-radius: 60px;
             z-index: 5000;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             pointer-events: none;
         }
 
@@ -346,7 +351,7 @@
 <body>
 <div class="dashboard">
     <div class="top-bar">
-        <h1>🥌 ESV Grein · Stock & Kehren 🥌</h1>
+        <h1>🥌 ESV Grein · Automatik-Wertung 🥌</h1>
         <div class="settings-group">
             <input type="text" id="teamANameSide" class="team-name-input" value="Team Nord">
             <span>🆚</span>
@@ -368,9 +373,9 @@
                 <option value="6" selected>6 Spieler</option>
             </select>
             <select id="stockPunkteSelect" class="setting-select">
-                <option value="4">4 Stockpunkte</option>
-                <option value="5">5 Stockpunkte</option>
-                <option value="6" selected>6 Stockpunkte</option>
+                <option value="4">4 Punkte</option>
+                <option value="5">5 Punkte</option>
+                <option value="6" selected>6 Punkte</option>
             </select>
             <button id="applyConfigBtn" class="apply-btn">Übernehmen</button>
             <div class="speech-toggle"><input type="checkbox" id="speechToggleSide" checked><label>🔊 Ansage</label></div>
@@ -380,17 +385,18 @@
     <div class="input-left">
         <div class="team-header"><span>🥌</span> <span id="leftTeamName">Team Nord</span></div>
         <div id="leftStocksPanel" class="stock-grid-side"></div>
-        <div style="text-align:center; font-size:9px; margin-top:10px; color:#698a69;">👆 Stockpunkte (1..max)</div>
+        <div style="text-align:center; font-size:9px; margin-top:10px; color:#698a69;">👆 Stockpunkte (1..max) antippen</div>
     </div>
 
     <div class="center-hero">
+        <!-- GRÖSSERE ERGEBNISSE -->
         <div class="result-mega">
-            <div class="result-card-big" style="border-bottom: 5px solid #2c7a4d;">
+            <div class="result-card-big" style="border-bottom: 6px solid #2c7a4d;">
                 <div class="result-team-big"><span>🥌</span> <span id="centerTeamA">Team Nord</span></div>
                 <div class="current-round-big" id="centerTotalA">0</div>
                 <div class="games-won-big">🏆 GEWONNENE SPIELE 🏆<br><span class="games-number-big" id="centerGamesA">0</span></div>
             </div>
-            <div class="result-card-big" style="border-bottom: 5px solid #c0392b;">
+            <div class="result-card-big" style="border-bottom: 6px solid #c0392b;">
                 <div class="result-team-big"><span id="centerTeamB">Team Süd</span> <span>🥌</span></div>
                 <div class="current-round-big" id="centerTotalB">0</div>
                 <div class="games-won-big">🏆 GEWONNENE SPIELE 🏆<br><span class="games-number-big" id="centerGamesB">0</span></div>
@@ -398,42 +404,39 @@
         </div>
 
         <div class="info-row">
-            <div class="current-stock-center">
-                <span class="current-stock-label">🟢 AKTUELLER STOCK</span>
-                <span class="current-stock-number" id="currentStockDisplay">1</span>
+            <!-- Anzeige "Aktueller Stock" wurde entfernt - nur noch Kehrenanzeige -->
+            <div class="current-kehre-display">
+                <span class="current-kehre-label">📋 AKTUELLE KEHRE</span>
+                <span class="current-kehre-number" id="currentKehreDisplay">1</span>
             </div>
-            <div class="current-stock-center">
-                <span class="current-stock-label">📋 AKTUELLE KEHRE</span>
-                <span class="current-stock-number" id="currentKehreDisplay">1</span>
-            </div>
-            <div class="lock-info" id="lockInfoMitte" style="display: none;">🔒 Spiel beendet</div>
+            <div class="lock-info" id="lockInfoMitte" style="display: none;">🔒 Sieger steht fest</div>
         </div>
-        <div id="globalWinnerMsg" style="margin-top: 6px; text-align: center;"></div>
+        <div id="globalWinnerMsg" style="margin-top: 8px; text-align: center;"></div>
     </div>
 
     <div class="input-right">
         <div class="team-header"><span id="rightTeamName">Team Süd</span> <span>🥌</span></div>
         <div id="rightStocksPanel" class="stock-grid-side"></div>
-        <div style="text-align:center; font-size:9px; margin-top:10px; color:#698a69;">👆 Stockpunkte (1..max)</div>
+        <div style="text-align:center; font-size:9px; margin-top:10px; color:#698a69;">👆 Stockpunkte (1..max) antippen</div>
     </div>
 
     <div class="action-footer">
         <button class="action-btn action-win" id="winGameBtn">🏆 Manuell werten</button>
         <button class="action-btn action-reset" id="resetRoundBtn">🔄 Runde löschen</button>
         <button class="action-btn action-new" id="newGameBtn">✨ Neues Spiel</button>
-        <button class="action-btn action-clear" id="resetTotalBtn">🗑️ Siege zurücksetzen</button>
+        <button class="action-btn action-clear" id="resetTotalBtn">🗑️ Siege reset</button>
         <button class="action-btn action-pdf" id="printPDFBtn">🖨️ Drucken (PDF)</button>
     </div>
 </div>
 
 <script>
     // -------------------- KONFIGURATION --------------------
-    let anzahlKehren = 6;           // 4-12 Kehren (Wie viele Runden gespielt werden)
-    let anzahlStoecke = 6;          // Anzahl Spieler = Stöcke pro Kehre (4-6)
-    let maxStockPunkte = 6;         // maximaler Stockpunkt pro Eingabe (4-6)
+    let anzahlKehren = 6;
+    let anzahlStoecke = 6;
+    let maxStockPunkte = 6;
     
-    // Für jede Kehre werden die Punkte der Stöcke gespeichert: teamAKehren[kehre][stock] = punkte
-    let teamAKehren = [];  // 2D: [kehre][stock]
+    // Datenstruktur: teamAKehren[kehre][stock]
+    let teamAKehren = [];
     let teamBKehren = [];
     
     let gamesWonA = 0, gamesWonB = 0;
@@ -442,8 +445,7 @@
     let teamBName = "Team Süd";
     let speechEnabled = true;
     let autoEvaluationLock = false;
-    let currentKehreIndex = 0;      // 0-basiert, welche Kehre gerade aktiv ist
-
+    
     // DOM
     const centerTeamA = document.getElementById('centerTeamA');
     const centerTeamB = document.getElementById('centerTeamB');
@@ -451,14 +453,12 @@
     const centerTotalB = document.getElementById('centerTotalB');
     const centerGamesA = document.getElementById('centerGamesA');
     const centerGamesB = document.getElementById('centerGamesB');
-    const currentStockSpan = document.getElementById('currentStockDisplay');
     const currentKehreSpan = document.getElementById('currentKehreDisplay');
     const globalWinnerMsgDiv = document.getElementById('globalWinnerMsg');
     const lockInfoMitte = document.getElementById('lockInfoMitte');
-
+    
     const sumArray = arr => arr.reduce((a,b)=>a+b,0);
     
-    // Initialisierung der Datenstruktur
     function initDataStructures() {
         teamAKehren = [];
         teamBKehren = [];
@@ -468,11 +468,10 @@
         }
     }
     
-    // Aktuelle Kehre (1-basiert, die erste unvollständige oder aktuelle)
+    // Welche Kehre ist aktuell dran? (1-basiert, erste unvollständige)
     function getCurrentKehreNumber() {
         if (overallWinner) return anzahlKehren;
         for (let k = 0; k < anzahlKehren; k++) {
-            // Prüfen ob in dieser Kehre alle Stöcke noch leer sind (0,0)
             let allStocksEmpty = true;
             for (let s = 0; s < anzahlStoecke; s++) {
                 if (teamAKehren[k][s] !== 0 || teamBKehren[k][s] !== 0) {
@@ -485,44 +484,30 @@
         return anzahlKehren;
     }
     
-    // Prüft ob die aktuelle Kehre komplett gespielt ist (alle Stöcke haben einen Wert >0 bei mindestens einem Team? eigentl. pro Stock min ein Punkt)
-    function isCurrentKehreComplete() {
-        const kehreIdx = getCurrentKehreNumber() - 1;
-        if (kehreIdx >= anzahlKehren) return true;
+    // Prüft ob eine bestimmte Kehre komplett gespielt ist (alle Stöcke haben Werte)
+    function isKehreComplete(kehreIdx) {
         for (let s = 0; s < anzahlStoecke; s++) {
             if (teamAKehren[kehreIdx][s] === 0 && teamBKehren[kehreIdx][s] === 0) return false;
         }
         return true;
     }
     
-    // Prüft ob alle Kehren komplett gespielt sind
+    // Prüft ob alle Kehren gespielt wurden
     function isEveryKehrePlayed() {
         for (let k = 0; k < anzahlKehren; k++) {
-            let hasValues = false;
-            for (let s = 0; s < anzahlStoecke; s++) {
-                if (teamAKehren[k][s] !== 0 || teamBKehren[k][s] !== 0) {
-                    hasValues = true;
-                    break;
-                }
-            }
-            if (!hasValues) return false;
+            if (!isKehreComplete(k)) return false;
         }
         return true;
     }
     
-    // Summe einer Kehre über alle Stöcke
-    function sumKehre(teamKehren, kehreIdx) {
-        return sumArray(teamKehren[kehreIdx]);
-    }
-    
-    // Gesamtsumme über alle Kehren (aktuelles Spiel)
+    // Gesamtpunkte über alle Kehren
     function totalGamePoints(teamKehren) {
         let total = 0;
         for (let k = 0; k < anzahlKehren; k++) total += sumArray(teamKehren[k]);
         return total;
     }
     
-    // Automatische Spielauswertung nach allen Kehren
+    // AUTOMATISCHE WERTUNG nach Abschluss aller Kehren
     function autoEvaluateGameIfComplete() {
         if (overallWinner) return false;
         if (!isEveryKehrePlayed()) return false;
@@ -539,20 +524,20 @@
         else if (totalB > totalA) winnerTeam = 'B';
         else isTie = true;
         
-        const winnerName = winnerTeam === 'A' ? teamAName : (winnerTeam === 'B' ? teamBName : null);
         if (!isTie && winnerTeam) {
+            const winnerName = winnerTeam === 'A' ? teamAName : teamBName;
             speakText(`Alle ${anzahlKehren} Kehren gespielt. ${winnerName} gewinnt das Spiel mit ${totalA}:${totalB}.`);
-            showToast(`🏆 Automatische Wertung: ${winnerName} gewinnt! (${totalA}:${totalB})`, 2800);
+            showToast(`🏆 Automatische Wertung: ${winnerName} gewinnt! (${totalA}:${totalB})`, 3000);
             if (winnerTeam === 'A') gamesWonA++;
             else gamesWonB++;
             updateCenterUI();
             if (!checkAndSetOverallWinner()) {
-                // Nächste Runde: Alle Kehren zurücksetzen
+                // Nächste Runde: Komplettreset der Kehren
                 initDataStructures();
                 renderFullPanels();
                 updateCenterUI();
-                showToast("🔄 Neue Runde – alle Kehren & Stöcke zurückgesetzt", 1800);
-                speakText("Neue Runde gestartet.");
+                showToast("🔄 Neue Runde gestartet – alle Kehren zurückgesetzt", 1800);
+                speakText("Neue Runde, alle Kehren zurückgesetzt.");
             } else {
                 renderFullPanels();
                 updateCenterUI();
@@ -560,9 +545,9 @@
             autoEvaluationLock = false;
             return true;
         } else if (isTie) {
-            speakText(`Alle ${anzahlKehren} Kehren gespielt. Unentschieden ${totalA}:${totalB}. Bitte manuell entscheiden.`);
-            showToast(`⚠️ Unentschieden (${totalA}:${totalB}) – "Spiel gewinnen" nutzen.`, 4000);
-            globalWinnerMsgDiv.innerHTML = `<div class="global-winner" style="background:#ffe0a3;">🤝 UNENTSCHIEDEN nach ${anzahlKehren} Kehren (${totalA}:${totalB}). Klicke "Spiel gewinnen" für Sieger.</div>`;
+            speakText(`Alle Kehren gespielt. Unentschieden ${totalA}:${totalB}. Bitte manuell entscheiden.`);
+            showToast(`⚠️ UNENTSCHIEDEN (${totalA}:${totalB}) – Nutze "Spiel gewinnen"`, 4000);
+            globalWinnerMsgDiv.innerHTML = `<div class="global-winner" style="background:#ffe0a3;">🤝 UNENTSCHIEDEN nach ${anzahlKehren} Kehren (${totalA}:${totalB}) → bitte Sieger wählen</div>`;
             autoEvaluationLock = false;
             return false;
         }
@@ -587,44 +572,47 @@
         return false;
     }
     
-    function getCurrentStockInKehre() {
-        if (overallWinner) return anzahlStoecke;
-        const kehreIdx = getCurrentKehreNumber() - 1;
-        if (kehreIdx >= anzahlKehren) return anzahlStoecke;
-        for (let s = 0; s < anzahlStoecke; s++) {
-            if (teamAKehren[kehreIdx][s] === 0 && teamBKehren[kehreIdx][s] === 0) return s + 1;
-        }
-        return anzahlStoecke;
-    }
-    
+    // Punkte setzen
     function setPoints(team, kehreIdx, stockIdx, punkte) {
         if (overallWinner) { showToast("Spiel beendet – neues Spiel starten"); return; }
+        // Prüfen, ob die aktuelle Kehre nicht bereits abgeschlossen ist (darf nur in current Kehre bearbeitet werden)
+        const currentKehre = getCurrentKehreNumber() - 1;
+        if (kehreIdx !== currentKehre) {
+            showToast(`Nur die aktuelle Kehre (${currentKehre+1}) kann bearbeitet werden.`, 1500);
+            return;
+        }
         if (punkte >= 1 && punkte <= maxStockPunkte) {
             let old = (team === 'A') ? teamAKehren[kehreIdx][stockIdx] : teamBKehren[kehreIdx][stockIdx];
             if (old !== punkte) {
                 if (team === 'A') teamAKehren[kehreIdx][stockIdx] = punkte;
                 else teamBKehren[kehreIdx][stockIdx] = punkte;
                 const tname = (team === 'A') ? teamAName : teamBName;
-                speakText(`${tname} erzielt bei Kehre ${kehreIdx+1}, Stock ${stockIdx+1} ${punkte===1 ? 'einen Punkt' : punkte+' Punkte'}.`);
+                speakText(`${tname} erzielt bei Kehre ${kehreIdx+1}, Stock ${stockIdx+1} ${punkte === 1 ? 'einen Punkt' : punkte+' Punkte'}.`);
                 renderFullPanels();
                 updateCenterUI();
-                // Prüfen ob aktuelle Kehre vollständig => automatisch weiter? Nein, aber wenn alle Kehren voll => Spielende
+                
+                // Automatische Prüfung nach jeder Eingabe – wenn alle Kehren voll => Spielende
                 if (isEveryKehrePlayed() && !overallWinner && !autoEvaluationLock) {
                     autoEvaluateGameIfComplete();
                 }
             }
         } else {
-            showToast(`Punkte nur zwischen 1 und ${maxStockPunkte} erlaubt`, 1200);
+            showToast(`Punkte nur 1-${maxStockPunkte} möglich`, 1000);
         }
     }
     
     function deleteStock(team, kehreIdx, stockIdx) {
         if (overallWinner) { showToast("Spiel beendet"); return; }
+        const currentKehre = getCurrentKehreNumber() - 1;
+        if (kehreIdx !== currentKehre) {
+            showToast(`Nur aktuelle Kehre (${currentKehre+1}) editierbar`, 1200);
+            return;
+        }
         if (team === 'A') teamAKehren[kehreIdx][stockIdx] = 0;
         else teamBKehren[kehreIdx][stockIdx] = 0;
         renderFullPanels();
         updateCenterUI();
-        showToast(`Punkt in Kehre ${kehreIdx+1}, Stock ${stockIdx+1} gelöscht`, 1000);
+        showToast(`Punkt in Kehre ${kehreIdx+1}, Kehre ${stockIdx+1} gelöscht`, 1000);
         if (globalWinnerMsgDiv.innerHTML.includes("UNENTSCHIEDEN")) globalWinnerMsgDiv.innerHTML = '';
     }
     
@@ -633,8 +621,8 @@
         initDataStructures();
         renderFullPanels();
         updateCenterUI();
-        showToast("Alle Kehren & Stöcke gelöscht – beginne bei Kehre 1, Stock 1", 1800);
-        speakText("Runde komplett zurückgesetzt.");
+        showToast("Alle Kehren & Stöcke zurückgesetzt – starte bei Kehre 1", 1800);
+        speakText("Runde komplett gelöscht.");
         autoEvaluationLock = false;
         if (globalWinnerMsgDiv.innerHTML.includes("UNENTSCHIEDEN")) globalWinnerMsgDiv.innerHTML = '';
     }
@@ -648,7 +636,7 @@
             initDataStructures();
             renderFullPanels();
             updateCenterUI();
-            showToast("Neue Runde gestartet – Kehren zurückgesetzt", 1500);
+            showToast("Neue Runde gestartet – alle Kehren zurück", 1500);
         } else {
             renderFullPanels();
             updateCenterUI();
@@ -665,7 +653,7 @@
             const modalDiv = document.createElement('div');
             modalDiv.style.position='fixed'; modalDiv.style.top=0; modalDiv.style.left=0; modalDiv.style.right=0; modalDiv.style.bottom=0;
             modalDiv.style.background='rgba(0,0,0,0.7)'; modalDiv.style.display='flex'; modalDiv.style.alignItems='center'; modalDiv.style.justifyContent='center'; modalDiv.style.zIndex=9999;
-            modalDiv.innerHTML = `<div style="background:white; border-radius: 48px; padding:20px; text-align:center;"><h3>🤝 Unentschieden</h3><p>${totalA}:${totalB} – Wer gewinnt das Spiel?</p><div style="display:flex; gap:12px; margin-top:16px;"><button id="chooseA" style="background:#2c7a4d; color:white; border:none; padding:6px 18px; border-radius:40px;">🥌 ${teamAName}</button><button id="chooseB" style="background:#c0392b; color:white; border:none; padding:6px 18px; border-radius:40px;">🥌 ${teamBName}</button><button id="cancelModal" style="background:#ccc;">Abbrechen</button></div></div>`;
+            modalDiv.innerHTML = `<div style="background:white; border-radius: 48px; padding:24px; text-align:center;"><h3>🤝 Unentschieden</h3><p>${totalA}:${totalB} – Wer gewinnt das Spiel?</p><div style="display:flex; gap:15px; margin-top:20px;"><button id="chooseA" style="background:#2c7a4d; color:white; border:none; padding:8px 24px; border-radius:40px;">🥌 ${teamAName}</button><button id="chooseB" style="background:#c0392b; color:white; border:none; padding:8px 24px; border-radius:40px;">🥌 ${teamBName}</button><button id="cancelModal" style="background:#ccc; padding:8px 20px;">Abbrechen</button></div></div>`;
             document.body.appendChild(modalDiv);
             modalDiv.querySelector('#chooseA').onclick = () => { addWin('A'); modalDiv.remove(); };
             modalDiv.querySelector('#chooseB').onclick = () => { addWin('B'); modalDiv.remove(); };
@@ -684,14 +672,14 @@
             updateCenterUI();
             renderFullPanels();
             globalWinnerMsgDiv.innerHTML = '';
-            showToast("Neues Spiel gestartet – Kehre 1, Stock 1", 1800);
+            showToast("Neues Spiel gestartet – Kehre 1", 1800);
             speakText("Neues Spiel gestartet.");
             document.body.classList.remove('game-finished');
         }
     }
     
     function resetScoreOnly() {
-        if (confirm("Nur gewonnene Spiele zurücksetzen? (Stockpunkte bleiben, Gesamtsieger entfernt)")) {
+        if (confirm("Nur gewonnene Spiele zurücksetzen? (Punkte bleiben erhalten)")) {
             gamesWonA = 0; gamesWonB = 0; overallWinner = false; autoEvaluationLock = false;
             updateCenterUI();
             renderFullPanels();
@@ -707,7 +695,7 @@
         let neueSpieler = parseInt(document.getElementById('playerCountSelect').value);
         let neueMaxPunkte = parseInt(document.getElementById('stockPunkteSelect').value);
         if (neueKehren !== anzahlKehren || neueSpieler !== anzahlStoecke || neueMaxPunkte !== maxStockPunkte) {
-            if (confirm(`Konfiguration ändern: ${neueKehren} Kehren, ${neueSpieler} Spieler/Stöcke, max. ${neueMaxPunkte} Stockpunkte? Aktuelle Runde wird zurückgesetzt.`)) {
+            if (confirm(`Konfiguration ändern: ${neueKehren} Kehren, ${neueSpieler} Spieler, max ${neueMaxPunkte} Punkte? Runde wird zurückgesetzt.`)) {
                 anzahlKehren = neueKehren;
                 anzahlStoecke = neueSpieler;
                 maxStockPunkte = neueMaxPunkte;
@@ -716,12 +704,10 @@
                 updateCenterUI();
                 renderFullPanels();
                 globalWinnerMsgDiv.innerHTML = '';
-                showToast(`Einstellungen: ${anzahlKehren} Kehren, ${anzahlStoecke} Spieler, max ${maxStockPunkte} Punkte`, 2000);
-                speakText(`Neue Konfiguration aktiv.`);
+                showToast(`Konfiguration übernommen: ${anzahlKehren} Kehren, ${anzahlStoecke} Spieler`, 2000);
+                speakText("Einstellungen aktualisiert.");
             }
-        } else {
-            showToast("Bereits aktiv", 1000);
-        }
+        } else { showToast("Bereits aktiv", 1000); }
     }
     
     function updateCenterUI() {
@@ -732,10 +718,8 @@
         centerGamesA.innerText = gamesWonA;
         centerGamesB.innerText = gamesWonB;
         
-        const currentKehre = getCurrentKehreNumber();
-        const currentStock = getCurrentStockInKehre();
-        currentKehreSpan.innerText = overallWinner ? "🏁" : currentKehre;
-        currentStockSpan.innerText = overallWinner ? "🏆" : currentStock;
+        const currKehre = getCurrentKehreNumber();
+        currentKehreSpan.innerText = overallWinner ? "🏁" : currKehre;
         
         if (overallWinner) {
             const winnerName = gamesWonA >= 2 ? teamAName : teamBName;
@@ -745,32 +729,29 @@
         } else {
             lockInfoMitte.style.display = 'none';
             document.body.classList.remove('game-finished');
-            if (isEveryKehrePlayed() && !autoEvaluationLock) {
-                autoEvaluateGameIfComplete();
-            } else if (!isEveryKehrePlayed() && globalWinnerMsgDiv.innerHTML.includes("UNENTSCHIEDEN")) {
-                globalWinnerMsgDiv.innerHTML = '';
-            }
+            if (isEveryKehrePlayed() && !autoEvaluationLock) autoEvaluateGameIfComplete();
+            else if (!isEveryKehrePlayed() && globalWinnerMsgDiv.innerHTML.includes("UNENTSCHIEDEN")) globalWinnerMsgDiv.innerHTML = '';
         }
-        updateRowColors();
+        updateRowColorsAndKehrenBackground();
     }
     
-    function updateRowColors() {
-        const currentKehre = getCurrentKehreNumber() - 1;
+    // Färbt jede Stock-Zeile entsprechend: Wenn die Kehre dieser Zeile bereits gespielt ist -> rot, wenn es die aktuelle Kehre ist -> grün
+    function updateRowColorsAndKehrenBackground() {
+        const currentKehreIdx = getCurrentKehreNumber() - 1;
         const leftRows = document.querySelectorAll('#leftStocksPanel .stock-row');
         const rightRows = document.querySelectorAll('#rightStocksPanel .stock-row');
-        // Jede Zeile repräsentiert einen Stock der aktuellen Kehre? Unser Panel zeigt immer die AKTUELLE Kehre an.
-        // Also müssen wir die Farben basierend auf dem Stock-Index innerhalb der aktuellen Kehre setzen.
-        if (overallWinner) return;
-        const currentStockIdx = getCurrentStockInKehre() - 1;
         for (let i = 0; i < leftRows.length; i++) {
-            leftRows[i].classList.remove('current-stock-bg', 'played-stock-bg');
-            rightRows[i].classList.remove('current-stock-bg', 'played-stock-bg');
-            if (i === currentStockIdx) {
-                leftRows[i].classList.add('current-stock-bg');
-                rightRows[i].classList.add('current-stock-bg');
-            } else if (i < currentStockIdx) {
-                leftRows[i].classList.add('played-stock-bg');
-                rightRows[i].classList.add('played-stock-bg');
+            leftRows[i].classList.remove('current-kehre-bg', 'played-kehre-bg');
+            rightRows[i].classList.remove('current-kehre-bg', 'played-kehre-bg');
+            // Die Zeilen repräsentieren die AKTUELLE Kehre (immer die aktuell anzuzeigende)
+            if (currentKehreIdx < anzahlKehren && isKehreComplete(currentKehreIdx)) {
+                // Diese Kehre ist bereits komplett gespielt => roter Hintergrund
+                leftRows[i].classList.add('played-kehre-bg');
+                rightRows[i].classList.add('played-kehre-bg');
+            } else if (currentKehreIdx < anzahlKehren && !isKehreComplete(currentKehreIdx)) {
+                // Aktive, nicht abgeschlossene Kehre => grüner Hintergrund
+                leftRows[i].classList.add('current-kehre-bg');
+                rightRows[i].classList.add('current-kehre-bg');
             }
         }
     }
@@ -790,11 +771,11 @@
         rightPanel.innerHTML = '';
         
         for (let s = 0; s < anzahlStoecke; s++) {
-            // Linke Seite (Team A)
+            // Team A
             const rowLeft = document.createElement('div'); rowLeft.className = 'stock-row';
             let btnsHtml = '';
             for (let p = 1; p <= maxStockPunkte; p++) btnsHtml += `<button class="side-punkt" data-val="${p}">${p}</button>`;
-            rowLeft.innerHTML = `<div class="stock-nr">Stock ${s+1}</div><div class="punkte-group">
+            rowLeft.innerHTML = `<div class="stock-nr">Kehre ${s+1}</div><div class="punkte-group">
                 ${btnsHtml}
                 <span class="side-value">${teamAKehren[currentKehreIdx][s] || 0}</span>
                 <button class="side-del">🗑️</button>
@@ -806,7 +787,7 @@
             rowLeft.querySelector('.side-del').addEventListener('click', () => deleteStock('A', currentKehreIdx, s));
             leftPanel.appendChild(rowLeft);
             
-            // Rechte Seite (Team B)
+            // Team B
             const rowRight = document.createElement('div'); rowRight.className = 'stock-row';
             rowRight.innerHTML = `<div class="stock-nr">Stock ${s+1}</div><div class="punkte-group">
                 ${btnsHtml}
@@ -820,7 +801,7 @@
             rowRight.querySelector('.side-del').addEventListener('click', () => deleteStock('B', currentKehreIdx, s));
             rightPanel.appendChild(rowRight);
         }
-        updateRowColors();
+        updateRowColorsAndKehrenBackground();
     }
     
     function speakText(text) {
@@ -829,16 +810,16 @@
             try { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang='de-DE'; u.rate=0.9; window.speechSynthesis.speak(u); } catch(e) {}
         }
     }
-    function showToast(msg, duration=2000) {
+    function showToast(msg, duration=2200) {
         let t = document.getElementById('dynamicToast');
         if(!t){ t=document.createElement('div'); t.id='dynamicToast'; t.className='toast-msg'; document.body.appendChild(t); }
         t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',duration);
     }
     
-    // Event binding
+    // Event listener
     document.getElementById('applyConfigBtn').onclick = applyConfiguration;
-    document.getElementById('teamANameSide').oninput = (e) => { teamAName = e.target.value.trim() || "Team Nord"; renderFullPanels(); updateCenterUI(); };
-    document.getElementById('teamBNameSide').oninput = (e) => { teamBName = e.target.value.trim() || "Team Süd"; renderFullPanels(); updateCenterUI(); };
+    document.getElementById('teamANameSide').oninput = (e) => { teamAName = e.target.value.trim() || "Mannschaft W"; renderFullPanels(); updateCenterUI(); };
+    document.getElementById('teamBNameSide').oninput = (e) => { teamBName = e.target.value.trim() || "Mannschaft E"; renderFullPanels(); updateCenterUI(); };
     document.getElementById('speechToggleSide').onchange = (e) => speechEnabled = e.target.checked;
     document.getElementById('winGameBtn').onclick = winGameHandler;
     document.getElementById('resetRoundBtn').onclick = resetRound;
@@ -847,12 +828,10 @@
     document.getElementById('printPDFBtn').onclick = () => window.print();
     
     function init() {
-        anzahlKehren = 6;
-        anzahlStoecke = 6;
-        maxStockPunkte = 6;
+        anzahlKehren = 6; anzahlStoecke = 6; maxStockPunkte = 6;
         initDataStructures();
         gamesWonA = 0; gamesWonB = 0; overallWinner = false;
-        teamAName = "Team Nord"; teamBName = "Team Süd";
+        teamAName = "Mannschaft W"; teamBName = "Mannschaft E";
         document.getElementById('teamANameSide').value = teamAName;
         document.getElementById('teamBNameSide').value = teamBName;
         document.getElementById('kehrenSelect').value = "6";
